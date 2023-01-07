@@ -1,7 +1,7 @@
 import { SxProps, Theme } from '@mui/material';
 
 export const WaitingRoomContainerStyle: SxProps<Theme> = (theme) => ({
-  bgcolor: 'primary.light',
+  bgcolor: '#E77D7D',
   pt: 8.75,
   pb: 7.5,
   borderWidth: 3,
@@ -17,8 +17,8 @@ export const WaitingRoomContainerStyle: SxProps<Theme> = (theme) => ({
   borderStyle: 'solid',
 
   '& .createdRoom': {
-    backgroundColor: theme.palette.secondary.dark,
-    '&:hover': { backgroundColor: theme.palette.secondary.dark },
+    backgroundColor: "#9DE77D",
+    '&:hover': { backgroundColor: "#9DE77D" },
     color: theme.palette.primary.dark,
     '& .text': {
       mr: '1rem',

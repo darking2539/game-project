@@ -2,9 +2,10 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Logo from '../Logo/Logo';
 import RectangleButton from '../Buttons/RectangleButton';
-import { Fade, GlobalStyles } from '@mui/material';
+import JoinRoomMenu from '../JoinRoomMenu/JoinRoomMenu';
+import { Fade, GlobalStyles, Modal } from '@mui/material';
 import { WaitingRoomContainerStyle } from './WaitingRoom.styles';
-import { Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { GameState } from '../../../../utils/Types';
 import { ReactComponent as DoorIcon } from '../../Icons/door-icon.svg';
 import { ReactComponent as HomeIcon } from '../../Icons/home-icon.svg';
@@ -16,15 +17,15 @@ interface WaitingRoomProps {
 
 export default function WaitingRoom(props: WaitingRoomProps) {
 
-    function onBackClicked() {
-        props.setGameState('main-menu');
-    }
+    const [openJoinRoomMenu, setOpenJoinRoomMenu] = useState(false);
+    const [title, setTitle] = useState<string>("");
+    const [state, setState] = useState<string>("");
 
     const menuGlobalStyles = (
         <GlobalStyles
             styles={(theme) => ({
                 body: {
-                    backgroundColor: theme.palette.primary.light,
+                    backgroundColor: "#E77D7D",
                     [theme.breakpoints.up('sm')]: {
                         backgroundColor: theme.palette.primary.main,
                     },
@@ -32,6 +33,27 @@ export default function WaitingRoom(props: WaitingRoomProps) {
             })}
         />
     );
+
+    const onBackClicked = () => {
+        props.setGameState('main-menu');
+    }
+
+    const onCreatedRoomClicked = () => {
+        setOpenJoinRoomMenu(true);
+        setTitle("CREATE ROOM");
+        setState("create");
+    }
+
+    const onJoinRoomClicked = () => {
+        setOpenJoinRoomMenu(true);
+        setTitle("JOIN ROOM");
+        setState("join");
+    }
+
+    const closeJoinRoomMenu = () => {
+        setOpenJoinRoomMenu(false);
+    }
+
 
     return (
         <>
@@ -43,13 +65,13 @@ export default function WaitingRoom(props: WaitingRoomProps) {
                             <Logo />
                         </h1>
                     </Box>
-                    <Stack component='main' spacing={2.5} style={{minWidth: "320px"}}>
-                        <RectangleButton className='createdRoom' variant='contained' endIcon={<HomeIcon />}>
+                    <Stack component='main' spacing={2.5} style={{ minWidth: "320px" }}>
+                        <RectangleButton className='createdRoom' onClick={onCreatedRoomClicked} variant='contained' endIcon={<HomeIcon />}>
                             <Box component='span'>
                                 Create Room
                             </Box>
                         </RectangleButton>
-                        <RectangleButton className='joinRoom' variant='contained' endIcon={<PersonIcon />} >
+                        <RectangleButton className='joinRoom' onClick={onJoinRoomClicked} variant='contained' endIcon={<PersonIcon />} >
                             <Box component='span'>
                                 Join Room
                             </Box>
@@ -60,6 +82,9 @@ export default function WaitingRoom(props: WaitingRoomProps) {
                             </Box>
                         </RectangleButton>
                     </Stack>
+                    <Modal open={openJoinRoomMenu} onClose={closeJoinRoomMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
+                        <JoinRoomMenu setGameState={props.setGameState} title={title} state={state} />
+                    </Modal>
                 </Box>
             </Fade>
         </>

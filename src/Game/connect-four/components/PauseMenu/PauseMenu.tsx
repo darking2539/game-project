@@ -7,7 +7,7 @@ import { pauseMenuStyles } from './PauseMenu.styles';
 interface PauseMenuProps {
   setGameState: Dispatch<SetStateAction<GameState>>;
   closeMenu: () => void;
-  onRestartGameClick: () => void;
+  onRestartGameClick?: () => void;
 }
 
 export default forwardRef((props: PauseMenuProps, _) => {

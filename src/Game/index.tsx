@@ -1,0 +1,1 @@
+export { default as ConnectFourGame } from './connect-four';

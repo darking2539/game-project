@@ -6,13 +6,17 @@ import JoinRoomMenu from '../JoinRoomMenu/JoinRoomMenu';
 import { Fade, GlobalStyles, Modal } from '@mui/material';
 import { WaitingRoomContainerStyle } from './WaitingRoom.styles';
 import { useState, Dispatch, SetStateAction } from 'react';
-import { GameState } from '../../../../utils/Types';
+import { GameState, Player } from '../../../../utils/Types';
 import { ReactComponent as DoorIcon } from '../../Icons/door-icon.svg';
 import { ReactComponent as HomeIcon } from '../../Icons/home-icon.svg';
 import { ReactComponent as PersonIcon } from '../../Icons/person-in-icon.svg';
 
 interface WaitingRoomProps {
     setGameState: Dispatch<SetStateAction<GameState>>;
+    setPlayerStatus: Dispatch<SetStateAction<Player>>;
+    setRoomCode: Dispatch<React.SetStateAction<string>>;
+    setYourName: Dispatch<React.SetStateAction<string>>;
+    setOppositeName: Dispatch<React.SetStateAction<string>>;
 }
 
 export default function WaitingRoom(props: WaitingRoomProps) {
@@ -83,7 +87,7 @@ export default function WaitingRoom(props: WaitingRoomProps) {
                         </RectangleButton>
                     </Stack>
                     <Modal open={openJoinRoomMenu} onClose={closeJoinRoomMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
-                        <JoinRoomMenu setGameState={props.setGameState} title={title} state={state} />
+                        <JoinRoomMenu setGameState={props.setGameState} title={title} state={state} setRoomCode={props.setRoomCode} setPlayerStatus={props.setPlayerStatus} setYourName={props.setYourName} setOppositeName={props.setOppositeName}  />
                     </Modal>
                 </Box>
             </Fade>

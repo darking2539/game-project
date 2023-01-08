@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, TextField } from '@mui/material';
-import { Dispatch, forwardRef, SetStateAction } from 'react';
-import { GameState } from '../../../../utils/Types';
+import { Dispatch, forwardRef, SetStateAction, useState } from 'react';
+import { GameState, Player } from '../../../../utils/Types';
 import RectangleButton from '../Buttons/RectangleButton';
 import RectangleTextField from '../TextField/RectangleTextField';
 import { joinRoomMenuStyles } from './JoinRoomMenu.styles';
@@ -9,13 +9,40 @@ interface JoinRoomMenuProps {
   state: string;
   title: string;
   setGameState: Dispatch<SetStateAction<GameState>>;
+  setPlayerStatus: Dispatch<SetStateAction<Player>>;
+  setRoomCode: Dispatch<React.SetStateAction<string>>;
+  setYourName: Dispatch<React.SetStateAction<string>>;
+  setOppositeName: Dispatch<React.SetStateAction<string>>;
 }
 
 export default forwardRef((props: JoinRoomMenuProps, _) => {
   
+  const [userName, setUsername] = useState<string>('');
+  const [roomCodeState, setRoomCodeState] = useState<string>('');
+
+  function MakeId(length: number) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
   
   const joinCreateAction = () => {
-    props.setGameState("multiplayer")
+    if (props.state == "create") {
+      props.setPlayerStatus("main");
+      var roomCode: string = MakeId(5);
+      props.setRoomCode(roomCode);
+      props.setYourName(userName)
+      props.setGameState("multiplayer");
+    } else {
+      props.setPlayerStatus("opponent");
+      props.setRoomCode(roomCodeState);
+      props.setYourName(userName)
+      props.setGameState("multiplayer");
+    }  
   }
 
   return (
@@ -23,6 +50,7 @@ export default forwardRef((props: JoinRoomMenuProps, _) => {
       <Typography variant='h2'>{props.title}</Typography>
       <Stack spacing={3}>
         <RectangleTextField className='restart-game-btn' variant="standard" placeholder='Enter Your Name'
+          onChange={(e: any) => setUsername(e.target.value)}
           sx={{ input: { textAlign: "center" } }}
           InputProps={{
             disableUnderline: true,
@@ -30,6 +58,7 @@ export default forwardRef((props: JoinRoomMenuProps, _) => {
         </RectangleTextField>
 
         {props.state === "join" && <RectangleTextField className='restart-game-btn' variant="standard" placeholder='Enter Room Code'
+          onChange={(e: any) => setRoomCodeState(e.target.value)}
           sx={{ input: { textAlign: "center" } }}
           InputProps={{
             disableUnderline: true,

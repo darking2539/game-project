@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GameBoard from './components/GameBoard/GameBoard';
 import GameBoardMultiPlayer from './components/GameBoardMultiPlayer/GameBoardMultiPlayer';
 import CPUIcon from './Icons/CPUIcon';
@@ -9,13 +9,20 @@ import MainMenu from './components/MainMenu/MainMenu';
 import Rules from './components/Rules/Rules';
 import WaitingRoom from './components/WaitingRoom/WaitingRoom';
 import themeOptions from '../../CustomTheme';
-import { GameState, OpponentName } from '../../utils/Types';
+import { GameState, OpponentName, Player } from '../../utils/Types';
 
 const theme = createTheme(themeOptions);
 
 function ConnectFourGame() {
+  //main-menu
   const [gameState, setGameState] = useState<GameState>('main-menu');
+  //offline-mode
   const [opponentName, setOpponentName] = useState<OpponentName>('Player 2');
+  //online-mode
+  const [roomCode, setRoomCode] = useState<string>('');
+  const [playerStatus, setPlayerStatus] = useState<Player>('main');
+  const [yourName, setYourName] = useState<string>('');
+  const [oppositeName, setOppositeName] = useState<string>('Watinng...');
 
   return (
     <>
@@ -24,8 +31,19 @@ function ConnectFourGame() {
         {gameState === 'main-menu' && <MainMenu setOpponentName={setOpponentName} setGameState={setGameState} />}
         {gameState === 'rules' && <Rules setGameState={setGameState} />}
         {gameState === 'game-board' && <GameBoard opponentIcon={opponentName === 'Player 2' ? <PlayerTwo /> : <CPUIcon />} opponentName={opponentName} setGameState={setGameState} />}
-        {gameState === 'waiting-room' && <WaitingRoom setGameState={setGameState} />}
-        {gameState === 'multiplayer' && <GameBoardMultiPlayer setGameState={setGameState} />}
+        {gameState === 'waiting-room' && <WaitingRoom setGameState={setGameState} setPlayerStatus={setPlayerStatus} setRoomCode={setRoomCode} setYourName={setYourName} setOppositeName={setOppositeName} />}
+        {gameState === 'multiplayer' &&
+          <GameBoardMultiPlayer
+            setGameState={setGameState}
+            setPlayerStatus={setPlayerStatus}
+            setRoomCode={setRoomCode}
+            setYourName={setYourName}
+            setOppositeName={setOppositeName}
+            yourName={yourName}
+            oppositeName={oppositeName}
+            playerStatus={playerStatus}
+            roomCode={roomCode} />
+        }
       </ThemeProvider>
     </>
   );

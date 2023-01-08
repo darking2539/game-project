@@ -33,6 +33,8 @@ interface GameBoardMultiplayerProps {
   oppositeName: string;
   playerStatus: Player;
   roomCode: string;
+  roomStatus: boolean;
+  setRoomStatus: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
@@ -66,9 +68,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
     }
     PlayGame(payload);
   }
-
   const onAreaClicked = (selectedClickAreaData: ClickAreaData) => {
-
     //block full column
     if (winner || selectedClickAreaData.fullColumn || disableUI) {
       return
@@ -80,6 +80,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
       "selectedClick": selectedClickAreaData,
       "allClickAreasData": allClickAreasData
     }
+
     PlayGame(payload);
   }
 
@@ -143,6 +144,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
 
   const handleStatusCallBack = useCallback((msg: any) => {
     //handle showName
+    console.log("status:", msg)
     if (msg?.status === "Start") {
       if (props.playerStatus === "main") {
         props.setOppositeName(msg?.join?.username);
@@ -153,6 +155,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
   }, []);
 
   const handlePlayGameCallBack = useCallback((msg: any) => {
+    console.log("play-game:", msg)
     if (msg?.selectedClick) {
       addChipInTable(msg?.selectedClick, msg?.allClickAreasData, msg?.clickBy);
     } else {
@@ -173,10 +176,19 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
       initiateSocketConnection(props.yourName);
       socket.on("status", handleStatusCallBack);
       socket.on("play-game", handlePlayGameCallBack);
+    }
+
+    if (!socket || props.roomStatus) {
       if (props.playerStatus === "main") {
         createdRoom(props.roomCode);
+        setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
+        props.setOppositeName("Wating...");
+        props.setRoomStatus(false);
       } else {
         joinRoom(props.roomCode);
+        setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
+        props.setOppositeName("Wating...");
+        props.setRoomStatus(false);
       }
     }
 

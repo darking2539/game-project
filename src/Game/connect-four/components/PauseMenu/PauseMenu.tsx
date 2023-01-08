@@ -3,6 +3,7 @@ import { Dispatch, forwardRef, SetStateAction } from 'react';
 import { GameState } from '../../../../utils/Types';
 import RectangleButton from '../Buttons/RectangleButton';
 import { pauseMenuStyles } from './PauseMenu.styles';
+import { setSocket } from "../../../../utils/socketio"
 
 interface PauseMenuProps {
   setGameState: Dispatch<SetStateAction<GameState>>;
@@ -23,7 +24,7 @@ export default forwardRef((props: PauseMenuProps, _) => {
             Restart
           </Box>
         </RectangleButton>
-        <RectangleButton className='quit-game-btn' variant='contained' onClick={() => props.setGameState('main-menu')}>
+        <RectangleButton className='quit-game-btn' variant='contained' onClick={() => {props.setGameState('main-menu'); setSocket(undefined)} }>
           <Box component='span'>Quit Game</Box>
         </RectangleButton>
       </Stack>

@@ -3,6 +3,10 @@ import { io } from 'socket.io-client';
 
 export let socket: any;
 
+export const setSocket = (value: any) => {
+    socket = value;
+}
+
 export const initiateSocketConnection = (username: string) => {
     socket = io(process.env.REACT_APP_SOCKET_ENDPOINT || "http://localhost:8080");
     socket.emit('set-username', username);

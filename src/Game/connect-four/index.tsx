@@ -23,6 +23,7 @@ function ConnectFourGame() {
   const [playerStatus, setPlayerStatus] = useState<Player>('main');
   const [yourName, setYourName] = useState<string>('');
   const [oppositeName, setOppositeName] = useState<string>('Watinng...');
+  const [roomStatus, setRoomStatus] = useState<boolean>(false);
 
   return (
     <>
@@ -31,7 +32,7 @@ function ConnectFourGame() {
         {gameState === 'main-menu' && <MainMenu setOpponentName={setOpponentName} setGameState={setGameState} />}
         {gameState === 'rules' && <Rules setGameState={setGameState} />}
         {gameState === 'game-board' && <GameBoard opponentIcon={opponentName === 'Player 2' ? <PlayerTwo /> : <CPUIcon />} opponentName={opponentName} setGameState={setGameState} />}
-        {gameState === 'waiting-room' && <WaitingRoom setGameState={setGameState} setPlayerStatus={setPlayerStatus} setRoomCode={setRoomCode} setYourName={setYourName} setOppositeName={setOppositeName} />}
+        {gameState === 'waiting-room' && <WaitingRoom yourName={yourName} setGameState={setGameState} setPlayerStatus={setPlayerStatus} setRoomCode={setRoomCode} setYourName={setYourName} setOppositeName={setOppositeName} setRoomStatus={setRoomStatus} />}
         {gameState === 'multiplayer' &&
           <GameBoardMultiPlayer
             setGameState={setGameState}
@@ -42,7 +43,9 @@ function ConnectFourGame() {
             yourName={yourName}
             oppositeName={oppositeName}
             playerStatus={playerStatus}
-            roomCode={roomCode} />
+            roomCode={roomCode}
+            roomStatus={roomStatus}
+            setRoomStatus={setRoomStatus} />
         }
       </ThemeProvider>
     </>

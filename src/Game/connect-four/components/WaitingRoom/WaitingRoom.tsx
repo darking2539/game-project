@@ -17,6 +17,8 @@ interface WaitingRoomProps {
     setRoomCode: Dispatch<React.SetStateAction<string>>;
     setYourName: Dispatch<React.SetStateAction<string>>;
     setOppositeName: Dispatch<React.SetStateAction<string>>;
+    setRoomStatus: Dispatch<React.SetStateAction<boolean>>;
+    yourName: string;
 }
 
 export default function WaitingRoom(props: WaitingRoomProps) {
@@ -87,7 +89,7 @@ export default function WaitingRoom(props: WaitingRoomProps) {
                         </RectangleButton>
                     </Stack>
                     <Modal open={openJoinRoomMenu} onClose={closeJoinRoomMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
-                        <JoinRoomMenu setGameState={props.setGameState} title={title} state={state} setRoomCode={props.setRoomCode} setPlayerStatus={props.setPlayerStatus} setYourName={props.setYourName} setOppositeName={props.setOppositeName}  />
+                        <JoinRoomMenu setGameState={props.setGameState} yourName={props.yourName} title={title} state={state} setRoomCode={props.setRoomCode} setPlayerStatus={props.setPlayerStatus} setYourName={props.setYourName} setOppositeName={props.setOppositeName} setRoomStatus={props.setRoomStatus}  />
                     </Modal>
                 </Box>
             </Fade>

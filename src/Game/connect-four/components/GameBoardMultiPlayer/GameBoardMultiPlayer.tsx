@@ -14,6 +14,7 @@ import { bottomBarStyles, gameBoardContainerStyles } from './GameBoardMultiPlaye
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useInitialRectData } from './hooks/useInitialRectData';
 import PauseMenu from '../PauseMenu/PauseMenu';
+import WaitingMenu from '../WaitingMenu/WaitingMenu';
 import { GameState, Player } from '../../../../utils/Types';
 import { RankingInfo, ClickAreaData } from '../../../../utils/Interfaces';
 import PlayerChip from '../GameObjects/PlayerChip/PlayerChip';
@@ -39,10 +40,12 @@ interface GameBoardMultiplayerProps {
 
 export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
 
-  const { setStartingPlayer, currentPlayer, setCurrentPlayer, allClickAreasData, setAllClickAreasData } = useInitialRectData();
+  const { currentPlayer, setCurrentPlayer, allClickAreasData, setAllClickAreasData } = useInitialRectData();
 
   const [playerChips, setPlayerChips] = useState<JSX.Element[]>([]);
   const [openPauseMenu, setOpenPauseMenu] = useState(false);
+  const [openLoadingMenu, setOpenLoadingMenu] = useState(true);
+  const [loadOppnent, setLoadOppnent] = useState(true);
   const [disableUI, setDisableUI] = useState(false);
   const [tieGame, setTieGame] = useState(false);
   const [showWinnerBox, setShowWinnerBox] = useState(false);
@@ -111,15 +114,6 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
     const x = lowestClickAreaRef.current.x + 44;
     const y = lowestClickAreaRef.current.y + 44;
 
-    setPlayerChips((oldValues) => {
-      return [
-        ...oldValues,
-        <Slide key={new Date().getTime()} timeout={500} in={true} container={containerRef.current}>
-          <PlayerChip colour={mainColour[clickBy]} x={x} y={y} />
-        </Slide>,
-      ];
-    });
-
     // check status game
     const isTied = isTieGame(allClickAreasDataFromSocket, COLUMNS, ROWS);
     const matches = processForWinnersOrSwap(newClickAreas[newIndex], allClickAreasDataFromSocket, COLUMNS, WINNING_LENGTH);
@@ -140,6 +134,17 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
       setDisableUI(clickBy === props.playerStatus);
     }
 
+    setPlayerChips((oldValues) => {
+      return [
+        ...oldValues,
+        <Slide key={new Date().getTime()} timeout={500} in={true} container={containerRef.current}>
+          <PlayerChip colour={mainColour[clickBy]} x={x} y={y} />
+        </Slide>,
+      ];
+    });
+
+
+
   }
 
   const handleStatusCallBack = useCallback((msg: any) => {
@@ -148,9 +153,13 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
     if (msg?.status === "Start") {
       if (props.playerStatus === "main") {
         props.setOppositeName(msg?.join?.username);
+        setOpenLoadingMenu(false);
       } else {
         props.setOppositeName(msg?.create?.username);
+        setOpenLoadingMenu(false);
       };
+    } else if (msg?.status === "Waiting") {
+      setLoadOppnent(false);
     }
   }, []);
 
@@ -196,6 +205,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
 
   useEffect(() => {
     setDisableUI(props.playerStatus !== "main");
+    setLoadOppnent(true);
   }, [])
 
 
@@ -252,7 +262,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
                 </Fade>
               )}
 
-              {!winner && !tieGame && (
+              {!winner && !tieGame && !openLoadingMenu && (
                 <Fade in={true}>
                   <PlayerStatusBox playerName={PlayerName()} playerColour={mainColour[currentPlayer]} />
                 </Fade>
@@ -262,7 +272,10 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
           <ScoreBox score={oppositePlayerScore} Icon={<PlayerTwo />} playerText={props.playerStatus === "main" ? props.oppositeName : props.yourName} reverseText />
         </Box>
         <Modal open={openPauseMenu} onClose={closeMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
-          <PauseMenu setGameState={props.setGameState} closeMenu={closeMenu} />
+          <PauseMenu hideRestart={true} setGameState={props.setGameState} closeMenu={closeMenu} />
+        </Modal>
+        <Modal open={openLoadingMenu} onClose={closeMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
+          <WaitingMenu loading={loadOppnent} roomCode={props.roomCode} setGameState={props.setGameState} closeMenu={closeMenu} />
         </Modal>
       </Box>
     </Fade>

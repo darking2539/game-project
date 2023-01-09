@@ -9,6 +9,7 @@ interface PauseMenuProps {
   setGameState: Dispatch<SetStateAction<GameState>>;
   closeMenu: () => void;
   onRestartGameClick?: () => void;
+  hideRestart?: boolean;
 }
 
 export default forwardRef((props: PauseMenuProps, _) => {
@@ -19,12 +20,13 @@ export default forwardRef((props: PauseMenuProps, _) => {
         <RectangleButton className='continue-game-btn' variant='contained' onClick={props.closeMenu}>
           <Box component='span'>Continue Game</Box>
         </RectangleButton>
-        <RectangleButton className='restart-game-btn' variant='contained' onClick={props.onRestartGameClick}>
+        {!props.hideRestart && (<RectangleButton className='restart-game-btn' variant='contained' onClick={props.onRestartGameClick}>
           <Box component='span' className='text'>
             Restart
           </Box>
         </RectangleButton>
-        <RectangleButton className='quit-game-btn' variant='contained' onClick={() => {props.setGameState('main-menu'); setSocket(undefined)} }>
+        )}
+        <RectangleButton className='quit-game-btn' variant='contained' onClick={() => { props.setGameState('main-menu'); setSocket(undefined) }}>
           <Box component='span'>Quit Game</Box>
         </RectangleButton>
       </Stack>

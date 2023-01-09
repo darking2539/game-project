@@ -1,12 +1,7 @@
-import { Box, Fade, Slide } from '@mui/material';
-import { useRef, useState, useEffect, Dispatch, SetStateAction, useCallback } from 'react';
-import { mainColour } from '../../../../CustomTheme';
-import { OpponentName, Player } from '../../../../utils/Types';
-import MarkerIcon from '../../Icons/MarkerIcon';
-import PlayerChip from '../GameObjects/PlayerChip/PlayerChip';
+import { Box, Fade } from '@mui/material';
+import { Dispatch, SetStateAction } from 'react';
 import ConnectFourGridWhite from '../GameObjects/BoardGrid/ConnectFourGridWhite';
-import { mainGridStyles } from './GameGridMultiPlayer.styles';
-import { RankingInfo, ClickAreaData } from '../../../../utils/Interfaces';
+import { ClickAreaData } from '../../../../utils/Interfaces';
 
 interface ConnectFourGridProps {
   allClickAreasData: ClickAreaData[];
@@ -20,7 +15,7 @@ interface ConnectFourGridProps {
 }
 
 export default function GameGrid(props: ConnectFourGridProps) {
-  const { allClickAreasData, playerChips, setPlayerChips, setAllClickAreasData, containerRef, onAreaClicked, disableUI } = props;
+  const { allClickAreasData, playerChips, onAreaClicked, disableUI } = props;
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { forwardRef } from 'react';
-import { OpponentName, Player } from '../../../../../utils/Types';
+import { Player } from '../../../../../utils/Types';
 import PillButton from '../../Buttons/PillButton';
 import { winnerBoxRootStyles } from './WinnerBox.styles';
 

@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import GameBoard from './components/GameBoard/GameBoard';
 import GameBoardMultiPlayer from './components/GameBoardMultiPlayer/GameBoardMultiPlayer';
 import CPUIcon from './Icons/CPUIcon';

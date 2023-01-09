@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, TextField } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { Dispatch, forwardRef, SetStateAction, useState } from 'react';
 import { GameState, Player } from '../../../../utils/Types';
 import RectangleButton from '../Buttons/RectangleButton';
@@ -32,7 +32,7 @@ export default forwardRef((props: JoinRoomMenuProps, _) => {
   }
 
   const joinCreateAction = () => {
-    if (props.state == "create") {
+    if (props.state === "create") {
       props.setPlayerStatus("main");
       var roomCode: string = MakeId(5);
       props.setRoomCode(roomCode);

@@ -10,13 +10,13 @@ import WinnerBox from '../GameObjects/WinnerBox/WinnerBoxMultiPlayer';
 import PlayerOne from '../../Icons/PlayerOne';
 import PlayerTwo from '../../Icons/PlayerTwo';
 import Logo from '../Logo/Logo';
-import { bottomBarStyles, gameBoardContainerStyles } from './GameBoardMultiPlayer.styles';
+import { gameBoardContainerStyles } from './GameBoardMultiPlayer.styles';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useInitialRectData } from './hooks/useInitialRectData';
 import PauseMenu from '../PauseMenu/PauseMenu';
 import WaitingMenu from '../WaitingMenu/WaitingMenu';
 import { GameState, Player } from '../../../../utils/Types';
-import { RankingInfo, ClickAreaData } from '../../../../utils/Interfaces';
+import { ClickAreaData } from '../../../../utils/Interfaces';
 import PlayerChip from '../GameObjects/PlayerChip/PlayerChip';
 import { assignChipToLowestSlotPossibleIndex, isTieGame, processForWinnersOrSwap, generateInitialRectDataArray } from './helpers';
 import { COLUMNS, ROWS, WINNING_LENGTH } from '../../../../utils/constants';
@@ -40,6 +40,8 @@ interface GameBoardMultiplayerProps {
 
 export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
 
+  const { setOppositeName, setRoomStatus, playerStatus, yourName, oppositeName, roomStatus, roomCode } = props
+
   const { currentPlayer, setCurrentPlayer, allClickAreasData, setAllClickAreasData } = useInitialRectData();
 
   const [playerChips, setPlayerChips] = useState<JSX.Element[]>([]);
@@ -48,7 +50,6 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
   const [loadOppnent, setLoadOppnent] = useState(true);
   const [disableUI, setDisableUI] = useState(false);
   const [tieGame, setTieGame] = useState(false);
-  const [showWinnerBox, setShowWinnerBox] = useState(false);
   const [mainPlayerScore, setMainPlayerScore] = useState<number>(0);
   const [oppositePlayerScore, setOppositePlayerScore] = useState<number>(0);
   const [winner, setWinner] = useState<Player | null>(null);
@@ -66,7 +67,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
   function onPlayAgainClick() {
     let payload = {
       "roomCode": props.roomCode,
-      "clickBy": props.playerStatus,
+      "clickBy": playerStatus,
       "allClickAreasData": generateInitialRectDataArray(COLUMNS, ROWS)
     }
     PlayGame(payload);
@@ -79,7 +80,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
 
     let payload = {
       "roomCode": props.roomCode,
-      "clickBy": props.playerStatus,
+      "clickBy": playerStatus,
       "selectedClick": selectedClickAreaData,
       "allClickAreasData": allClickAreasData
     }
@@ -131,7 +132,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
       //swap player
       setAllClickAreasData(newClickAreas);
       setCurrentPlayer(clickBy === "main" ? "opponent" : "main");
-      setDisableUI(clickBy === props.playerStatus);
+      setDisableUI(clickBy === playerStatus);
     }
 
     setPlayerChips((oldValues) => {
@@ -142,85 +143,86 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
         </Slide>,
       ];
     });
+  };
 
-
-
-  }
-
-  const handleStatusCallBack = useCallback((msg: any) => {
+  const handleStatusCallBack = useCallback((props: any) => {
     //handle showName
-    console.log("status:", msg)
-    if (msg?.status === "Start") {
-      if (props.playerStatus === "main") {
-        props.setOppositeName(msg?.join?.username);
+    console.log("status:", props);
+    if (props?.status === "Start") {
+      if (playerStatus === "main") {
+        setOppositeName(props?.join?.username);
         setOpenLoadingMenu(false);
       } else {
-        props.setOppositeName(msg?.create?.username);
+        setOppositeName(props?.create?.username);
         setOpenLoadingMenu(false);
       };
-    } else if (msg?.status === "Waiting") {
+    } else if (props?.status === "Waiting") {
       setLoadOppnent(false);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handlePlayGameCallBack = useCallback((msg: any) => {
-    console.log("play-game:", msg)
-    if (msg?.selectedClick) {
-      addChipInTable(msg?.selectedClick, msg?.allClickAreasData, msg?.clickBy);
+  const handlePlayGameCallBack = useCallback((props: any) => {
+    console.log("play-game:", props);
+    if (props?.selectedClick) {
+      addChipInTable(props?.selectedClick, props?.allClickAreasData, props?.clickBy);
     } else {
       //reset all table
-      setAllClickAreasData(msg?.allClickAreasData);
+      setAllClickAreasData(props?.allClickAreasData);
       setWinner(null);
       setTieGame(false);
       setPlayerChips([]);
-      setDisableUI(msg?.clickBy !== props.playerStatus);
-      setCurrentPlayer(msg?.clickBy === "main" ? "main" : "opponent");
+      setDisableUI(props?.clickBy !== playerStatus);
+      setCurrentPlayer(props?.clickBy === "main" ? "main" : "opponent");
     }
-
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
 
-    if (!socket) {
-      initiateSocketConnection(props.yourName);
-      socket.on("status", handleStatusCallBack);
-      socket.on("play-game", handlePlayGameCallBack);
-    }
+    function InitSocketIo() {
+      if (!socket) {
+        initiateSocketConnection(yourName);
+        socket.on("status", handleStatusCallBack);
+        socket.on("play-game", handlePlayGameCallBack);
+      };
 
-    if (!socket || props.roomStatus) {
-      if (props.playerStatus === "main") {
-        createdRoom(props.roomCode);
-        setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
-        props.setOppositeName("Wating...");
-        props.setRoomStatus(false);
-      } else {
-        joinRoom(props.roomCode);
-        setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
-        props.setOppositeName("Wating...");
-        props.setRoomStatus(false);
-      }
-    }
+      if (!socket || roomStatus) {
+        if (playerStatus === "main") {
+          createdRoom(roomCode);
+          setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
+          setOppositeName("Wating...");
+          setRoomStatus(false);
+        } else {
+          joinRoom(roomCode);
+          setAllClickAreasData(generateInitialRectDataArray(COLUMNS, ROWS));
+          setOppositeName("Wating...");
+          setRoomStatus(false);
+        }
+      };
+    };
 
-  }, [])
+    function InitGeneralData() {
+      setDisableUI(playerStatus !== "main");
+      setLoadOppnent(true);
+    };
+  
+    InitSocketIo();
+    InitGeneralData();
 
-  useEffect(() => {
-    setDisableUI(props.playerStatus !== "main");
-    setLoadOppnent(true);
-  }, [])
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   const PlayerName = () => {
-    if (props.playerStatus === "main") {
+    if (playerStatus === "main") {
       if (currentPlayer === "main") {
-        return props.yourName;
+        return yourName;
       } else {
-        return props.oppositeName;
+        return oppositeName;
       }
     } else {
       if (currentPlayer === "main") {
-        return props.oppositeName;
+        return oppositeName;
       } else {
-        return props.yourName;
+        return yourName;
       }
     }
   }
@@ -229,7 +231,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
     <Fade in={true}>
       <Box width='100%' height='100%' display='flex' justifyContent='center'>
         <Box sx={gameBoardContainerStyles}>
-          <ScoreBox score={mainPlayerScore} Icon={<PlayerOne />} playerText={props.playerStatus === "main" ? props.yourName : props.oppositeName} />
+          <ScoreBox score={mainPlayerScore} Icon={<PlayerOne />} playerText={playerStatus === "main" ? yourName : oppositeName} />
           <div className='central-content'>
             <header className='game-board-header'>
               <PillButton onClick={openMenu}>Menu</PillButton>
@@ -237,8 +239,8 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
               <CopyButton endIcon={<ContentCopyIcon />}>{props.roomCode}</CopyButton>
             </header>
             <div className='horizontal-scores'>
-              <ScoreBox score={mainPlayerScore} Icon={<PlayerOne />} iconPlacement='left' playerText={props.playerStatus === "main" ? props.yourName : props.oppositeName} />
-              <ScoreBox score={oppositePlayerScore} Icon={<PlayerTwo />} iconPlacement='right' playerText={props.playerStatus === "main" ? props.oppositeName : props.yourName} reverseText />
+              <ScoreBox score={mainPlayerScore} Icon={<PlayerOne />} iconPlacement='left' playerText={playerStatus === "main" ? yourName : oppositeName} />
+              <ScoreBox score={oppositePlayerScore} Icon={<PlayerTwo />} iconPlacement='right' playerText={playerStatus === "main" ? oppositeName : yourName} reverseText />
             </div>
             <div className='board'>
               <div className='connectFour'>
@@ -258,7 +260,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
             <div className='timer-container'>
               {(winner || tieGame) && (
                 <Fade in={true}>
-                  <WinnerBox tieGame={tieGame} onPlayAgainClick={onPlayAgainClick} currentPlayer={winner} winnerName={winner === props.playerStatus ? props.yourName : props.oppositeName} />
+                  <WinnerBox tieGame={tieGame} onPlayAgainClick={onPlayAgainClick} currentPlayer={winner} winnerName={winner === playerStatus ? yourName : oppositeName} />
                 </Fade>
               )}
 
@@ -269,7 +271,7 @@ export default function GameBoardMultiPlayer(props: GameBoardMultiplayerProps) {
               )}
             </div>
           </div>
-          <ScoreBox score={oppositePlayerScore} Icon={<PlayerTwo />} playerText={props.playerStatus === "main" ? props.oppositeName : props.yourName} reverseText />
+          <ScoreBox score={oppositePlayerScore} Icon={<PlayerTwo />} playerText={playerStatus === "main" ? oppositeName : yourName} reverseText />
         </Box>
         <Modal open={openPauseMenu} onClose={closeMenu} aria-labelledby='rules-title' aria-describedby='rules-description'>
           <PauseMenu hideRestart={true} setGameState={props.setGameState} closeMenu={closeMenu} />

@@ -48,7 +48,7 @@ export default function GameGrid(props: ConnectFourGridProps) {
                   component='rect'
                   sx={{
                     '@media (hover: hover) and (pointer: fine)': {
-                      cursor: data.fullColumn || disableUI ? 'pointer' : 'block',
+                      cursor: data.fullColumn || disableUI ? 'block' : 'pointer',
                     },
                   }}
                   onClick={() => onAreaClicked(data)}
